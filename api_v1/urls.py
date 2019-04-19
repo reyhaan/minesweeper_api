@@ -4,7 +4,7 @@ from . import views
 
 router = routers.DefaultRouter()
 
-router.register('map', views.MapViewSet, base_name='map')
+router.register('game', views.GameViewSet)
 
 urlpatterns = [
     path(r'', include(router.urls))
