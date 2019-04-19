@@ -22,9 +22,9 @@ class GameViewSet(viewsets.ModelViewSet):
             move = request.data.get('move')
             new_map_state = mapUtils.makeMove(move, request.data.get('map_state'))
             serializer.save( 
-                map_state='something adasdasdas'
+                map_state=new_map_state
             )
-            return Response({'map': request.data})
+            return Response({'map': new_map_state})
         else:
             return Response({'error': 'some error'})
 
