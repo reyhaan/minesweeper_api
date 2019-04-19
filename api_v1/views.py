@@ -18,26 +18,9 @@ class GameViewSet(viewsets.ModelViewSet):
     def move(self, request):
         return Response({'message': 'Helloe!', 'data': request.data})
 
-
-    # def retrieve(self, request, pk=None):
-        
-    #     serializer = GameSerializer(data=request.data)
-
-    #     if serializer.is_valid():
-    #         name = serializer.data.get('name')
-    #     else:
-    #         name = "not assigned"
-        
-    #     return Response({'message': 'Helloe!', 'data': name})
-
-    # def create(self, request):
-
-    #     serializer = GameSerializer(data=request.data)
-
-    #     if serializer.is_valid():
-    #         new_game = Game.objects.create(
-    #             name=serializer.data.get('name'),
-    #             uuid=serializer.data.get('uuid'),
-    #             mapState=serializer.data.get('mapState')
-    #         )
-    #     return Response({'message': 'CREATE_EVENT', 'data': request.data})
+    def perform_create(self, serializer):
+        serializer.save(
+            name=self.request.data.get('name'),
+            uuid=self.request.data.get('uuid'),
+            map_state=mapUtils.getNewMap()
+        )
