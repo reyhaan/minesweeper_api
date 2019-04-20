@@ -23,13 +23,8 @@ class GameBoard:
     def createSolution(self):
         for row in range(self.row):
             for col in range(self.col):
-                self.map_state[row][col]['adj'] = self.getMinesAround(row, col)
                 self.map_original[row][col]['adj'] = self.getMinesAround(row, col)
-
-                self.map_state[row][col]['is_revealed'] = True
                 self.map_original[row][col]['is_revealed'] = True
-
-                self.map_state[row][col]['state'] = self.getState(self.map_original[row][col])
                 self.map_original[row][col]['state'] = self.getState(self.map_original[row][col])
 
 
@@ -39,6 +34,9 @@ class GameBoard:
         self.map_original[r][c]['state'] = self.getState(self.map_original[r][c])
 
 
+    """
+    Traverse the map safely in all directions while revealing the cells along the way until you find a mine
+    """
     def reveal(self, r, c):
 
         # bound checks
@@ -83,18 +81,19 @@ class GameBoard:
             # found a mine already, finish the game
             if cell['has_mine']:
                 self.createSolution()
-                return self.map_state, True
+                return self.syncAndReturn(True)
             else:
-
+    
                 mines_around = self.getMinesAround(row, col)
 
                 if mines_around > 0:
+                    
                     self.markCellVisited(row, col)
-                    return self.map_original, False
+                    return self.syncAndReturn(False)
 
                 if cell_state == 0:
                     self.reveal(row, col)
-                    return self.map_original, False
+                    return self.syncAndReturn(False)
 
         # intent is to flag this cell
         elif intent == 'flag':
@@ -105,9 +104,30 @@ class GameBoard:
             else:
                 cell['has_flag'] = False
 
-        return self.map_original, False
+        return self.syncAndReturn(False)
 
 
+    """
+    Sync map current original state with the new state
+    """
+    def synchronize(self):
+        for row in range(self.row):
+            for col in range(self.col):
+                self.map_state[row][col]['adj'] = self.map_original[row][col]['adj']
+                self.map_state[row][col]['state'] = self.map_original[row][col]['state']
+
+
+    """
+    Sync map current original state with the new state and return new state with result
+    """
+    def syncAndReturn(self, result):
+        self.synchronize()
+        return self.map_state, result
+
+
+    """
+    Given a cell in the map, get number of mines around all 8 cells
+    """
     def getMinesAround(self, row, col):
         mines = 0
         max_rows = self.row

@@ -42,7 +42,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
             serializer.save(
                 map_state=new_map_state,
-                map_original=json.dumps(new_map_state) #user.map_original
+                map_original=json.dumps(gameBoard.map_original) #user.map_original
             )
             return Response({'user': request.data, 'new_map_state': new_map_state, 'hasLost': hasLost})
         else:

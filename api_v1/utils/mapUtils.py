@@ -1,7 +1,6 @@
 import random
 import copy
 import scipy.sparse as sparse
-import scipy.stats as stats
 import numpy as np
 
 def getNewMap():
@@ -18,10 +17,7 @@ def getNewMap():
         for j in range(col):
             new_map[i].append({
                 "adj": 0, 
-                "state": 0,
-                "has_mine": False,
-                "is_revealed": False,
-                "has_flag": False
+                "state": 0
             })
     
     map_state = copy.deepcopy(new_map)
@@ -29,8 +25,12 @@ def getNewMap():
     # populate map with mines
     for r in range(row):
         for c in range(col):
+            new_map[r][c]['is_revealed'] = False
+            new_map[r][c]['has_flag'] = False
             if matrix[r][c] == 1:
-                new_map[r][c]['has_mine'] = True    
+                new_map[r][c]['has_mine'] = True
+            else:
+                new_map[r][c]['has_mine'] = False
 
 
     map_original = copy.deepcopy(new_map)
