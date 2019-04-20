@@ -28,8 +28,10 @@ class GameBoard:
             for col in range(self.col):
                 self.map_state[row][col]['adj'] = self.getMinesAround(row, col)
                 self.map_original[row][col]['adj'] = self.getMinesAround(row, col)
+
                 self.map_state[row][col]['is_revealed'] = True
                 self.map_original[row][col]['is_revealed'] = True
+
                 self.map_state[row][col]['state'] = self.getState(self.map_original[row][col])
                 self.map_original[row][col]['state'] = self.getState(self.map_original[row][col])
 
@@ -52,7 +54,7 @@ class GameBoard:
 
         self.markCellVisited(r, c)
 
-        # Dont search further if any of the next cells has mine
+        # Dont search further if any of the next cells has a mine
         if self.map_original[r][c]['adj'] > 0:
             return
 
