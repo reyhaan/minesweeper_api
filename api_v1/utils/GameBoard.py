@@ -9,6 +9,7 @@ class GameBoard:
         self.map_original = map_original
         self.row = 10
         self.col = 10
+        self.num_of_mines = 0
 
 
     def getState(self, cell):
@@ -98,12 +99,6 @@ class GameBoard:
                 if cell_state == 0:
                     self.reveal(row, col)
                     return self.map_original, False
-
-                elif cell_state == 1:
-                    return self.map_state, False
-
-                elif cell_state == 3:
-                    return self.map_state, False
 
         # intent is to flag this cell
         elif intent == 'flag':
