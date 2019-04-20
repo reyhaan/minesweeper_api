@@ -47,6 +47,10 @@ class GameBoard:
 
         self.markCellVisited(r, c)
 
+        # Dont search further if any of the sext cell has mine
+        if self.map_original[r][c]['adj'] > 0:
+            return
+
         self.reveal(r+1, c)
         self.reveal(r-1, c)
         self.reveal(r, c+1)
