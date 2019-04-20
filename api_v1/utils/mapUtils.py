@@ -1,5 +1,7 @@
 import random
 import copy
+import scipy.sparse as sparse
+import scipy.stats as stats
 import numpy as np
 
 def getNewMap():
@@ -8,7 +10,7 @@ def getNewMap():
 
     new_map = []
 
-    matrix = np.random.randint(2, size=(row, col))
+    matrix = sparse.random(10, 10, density=0.15, data_rvs=np.ones).toarray()
 
     # create empty map
     for i in range(row):
@@ -24,19 +26,12 @@ def getNewMap():
     
     map_state = copy.deepcopy(new_map)
 
-    # for r in range(row):
-    #     for c in range(col):
-    #         if matrix[r][c] == 1:
-    #             new_map[r][c]['has_mine'] = True    
-
     # populate map with mines
-    rows_for_mines = random.randint(0, row)
-    for i in range(rows_for_mines):
-        rand_row = random.randint(0, row-1)
-        cells_for_mines = random.randint(0, col)
-        for j in range(cells_for_mines):
-            rand_cell = random.randint(0, col-1)
-            new_map[rand_row][rand_cell]['has_mine'] = True
+    for r in range(row):
+        for c in range(col):
+            if matrix[r][c] == 1:
+                new_map[r][c]['has_mine'] = True    
+
 
     map_original = copy.deepcopy(new_map)
     return map_state, map_original
