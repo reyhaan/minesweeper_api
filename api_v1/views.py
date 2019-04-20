@@ -26,7 +26,7 @@ class GameViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, pk=self.kwargs['pk'])
-        return Response({'name': user.name, 'uuid': user.uuid, 'map_state': json.loads(user.map_state)})
+        return Response({'name': user.name, 'uuid': user.uuid, 'map_state': json. loads(user.map_state)})
 
 
     @action(methods=['put'], detail=False)
@@ -39,7 +39,7 @@ class GameViewSet(viewsets.ModelViewSet):
             new_map_state = mapUtils.makeMove(move, json.loads(request.data.get('map_state')), json.loads(user.map_original))
             serializer.save(
                 map_state=new_map_state,
-                map_original=user.map_original
+                map_original=json.dumps(new_map_state) #user.map_original
             )
             return Response({'user': request.data, 'new_map_state': new_map_state})
         else:
