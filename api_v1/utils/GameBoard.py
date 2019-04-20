@@ -5,9 +5,14 @@ class GameBoard:
         self.map_original = map_original
         self.row = 10
         self.col = 10
-        self.num_of_mines = 0
 
-
+    """
+    Ideally the states should represent following:
+        - 0: Default
+        - 1: Revealed
+        - 2: Has Mine
+        - 3: Flagged
+    """
     def getState(self, cell):
 
         if cell['has_flag'] == True:
@@ -20,6 +25,9 @@ class GameBoard:
             return 1
 
 
+    """
+    Creates the final solution map
+    """
     def createSolution(self):
         for row in range(self.row):
             for col in range(self.col):
@@ -28,6 +36,9 @@ class GameBoard:
                 self.map_original[row][col]['state'] = self.getState(self.map_original[row][col])
 
 
+    """
+    Updates cell properties in original map when it is visited during search
+    """
     def markCellVisited(self, r, c):
         self.map_original[r][c]['adj'] = self.getMinesAround(r, c)
         self.map_original[r][c]['is_revealed'] = True
@@ -63,6 +74,9 @@ class GameBoard:
         self.reveal(r-1, c-1)
 
 
+    """
+    Calculates the new map state based on the move sent by the user
+    """
     def makeMove(self, move):
 
         intent = move['intent']
