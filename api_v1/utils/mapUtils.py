@@ -43,11 +43,11 @@ def makeMove(move, map_state, map_original):
 
         # bound checks
         if (r < 0 or c < 0 or r >= len(map_original) or c >= len(map_original[0])):
-            return map_original
+            return
 
         # stop searching if found a mine
         if map_original[r][c]['has_mine'] == True or map_original[r][c]['is_revealed'] == True:
-            return map_original
+            return
 
         map_original = markCellVisited(map_original, r, c)
 

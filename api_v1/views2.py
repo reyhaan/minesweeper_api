@@ -6,7 +6,6 @@ from rest_framework.decorators import action
 from .models import Game
 from .serializers import GameSerializer
 from api_v1.utils import mapUtils
-from api_v1.utils.GameBoard import GameBoard
 import json
 
 class GameViewSet(viewsets.ModelViewSet):
@@ -37,8 +36,7 @@ class GameViewSet(viewsets.ModelViewSet):
         serializer = GameSerializer(user, data=request.data)
         if serializer.is_valid():
             move = request.data.get('move')
-            gameBoard = GameBoard(json.loads(request.data.get('map_state')), json.loads(user.map_original))
-            new_map_state = gameBoard.makeMove(move)
+            new_map_state = mapUtils.makeMove(move, json.loads(request.data.get('map_state')), json.loads(user.map_original))
             serializer.save(
                 map_state=new_map_state,
                 map_original=json.dumps(new_map_state) #user.map_original
