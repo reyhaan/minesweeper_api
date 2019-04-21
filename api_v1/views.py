@@ -32,7 +32,14 @@ class GameViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, pk=self.kwargs['pk'])
-        return Response({'name': user.name, 'uuid': user.uuid, 'map_state': json.loads(user.map_state)}, status=status.HTTP_200_OK)
+
+        response = {
+            'name': user.name,
+            'uuid': user.uuid,
+            'map_state': json.loads(user.map_state)
+        }
+
+        return Response(response, status=status.HTTP_200_OK)
 
 
     @action(methods=['put'], detail=False)
@@ -76,13 +83,20 @@ class GameViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, pk=request.data.get('uuid'))
         serializer = GameSerializer(user, data=request.data)
+
         new_map_state, new_map_original = mapUtils.getNewMap()
+        
         if serializer.is_valid():
             serializer.save( 
                 map_state=json.dumps(new_map_state),
                 map_original=json.dumps(new_map_original)
             )
-            return Response({'user': request.data, 'new_map_state': new_map_state}, status=status.HTTP_200_OK)
+
+            response = {
+                'new_map_state': new_map_state
+            }
+
+            return Response(response, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
