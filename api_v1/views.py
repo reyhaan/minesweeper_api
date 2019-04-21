@@ -3,8 +3,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-from .models import Game
-from .serializers import GameSerializer
+from api_v1.models import Game
+from api_v1.serializers import GameSerializer
 from api_v1.utils import mapUtils
 from api_v1.utils.GameBoard import GameBoard
 import json
@@ -16,18 +16,23 @@ class GameViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         map_state, map_original = mapUtils.getNewMap()
-        serializer.save(
-            name=self.request.data.get('name'),
-            uuid=self.request.data.get('uuid'),
-            map_state=json.dumps(map_state),
-            map_original=json.dumps(map_original)
-        )
+        name = self.request.data.get('name')
+        uuid = self.request.data.get('uuid')
+        if serializer.is_valid():
+            serializer.save(
+                name=name,
+                uuid=uuid,
+                map_state=json.dumps(map_state),
+                map_original=json.dumps(map_original)
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, pk=self.kwargs['pk'])
-        return Response({'name': user.name, 'uuid': user.uuid, 'map_state': json. loads(user.map_state)})
+        return Response({'name': user.name, 'uuid': user.uuid, 'map_state': json.loads(user.map_state)}, status=status.HTTP_200_OK)
 
 
     @action(methods=['put'], detail=False)
@@ -35,18 +40,35 @@ class GameViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, pk=request.data.get('uuid'))
         serializer = GameSerializer(user, data=request.data)
+
         if serializer.is_valid():
+            # get original map from database
+            map_original = json.loads(user.map_original)
+
+            # get map_state from database
+            map_state = json.loads(user.map_state)
+
+            # get next move from user
             move = request.data.get('move')
-            gameBoard = GameBoard(json.loads(request.data.get('map_state')), json.loads(user.map_original))
-            new_map_state, hasLost, hasWon = gameBoard.makeMove(move)
+
+            gameBoard = GameBoard(map_state, map_original)
+            gameBoard.makeMove(move)
 
             serializer.save(
-                map_state=new_map_state,
-                map_original=json.dumps(gameBoard.map_original) #user.map_original
+                map_state=json.dumps(gameBoard.getMapState()),
+                map_original=json.dumps(gameBoard.getMapOriginal())
             )
-            return Response({'user': request.data, 'new_map_state': new_map_state, 'hasLost': hasLost, 'hasWon': hasWon})
+
+            response = {
+                'user': request.data, 
+                'new_map_state': gameBoard.getMapState(), 
+                'hasLost': gameBoard.getHasLost(), 
+                'hasWon': gameBoard.getHasWon()
+            }
+
+            return Response(response, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'some error'})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
     @action(methods=['put'], detail=False)
@@ -60,7 +82,7 @@ class GameViewSet(viewsets.ModelViewSet):
                 map_state=json.dumps(new_map_state),
                 map_original=json.dumps(new_map_original)
             )
-            return Response({'user': request.data, 'new_map_state': new_map_state})
+            return Response({'user': request.data, 'new_map_state': new_map_state}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'some error'})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

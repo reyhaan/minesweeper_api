@@ -19,5 +19,4 @@ from django.contrib import admin
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('api_v1.urls')),
-    path('api/v2/', include('api_v2.urls'))
 ]

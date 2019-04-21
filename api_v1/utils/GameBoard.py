@@ -3,8 +3,26 @@ class GameBoard:
     def __init__(self, map_state, map_original):
         self.map_state = map_state
         self.map_original = map_original
+        self.hasLost = False
+        self.hasWon = False
         self.row = 10
         self.col = 10
+
+    def getHasLost(self):
+        return self.hasLost
+    
+
+    def getHasWon(self):
+        return self.hasWon
+
+    
+    def getMapState(self):
+        return self.map_state
+    
+
+    def getMapOriginal(self):
+        return self.map_original
+
 
     """
     Ideally the states should represent following:
@@ -48,7 +66,7 @@ class GameBoard:
     """
     Find out if player has won/lost after a move
     """
-    def hasWon(self):
+    def hasPlayerWon(self):
         hasWon = True
         for row in range(self.row):
             for col in range(self.col):
@@ -149,11 +167,13 @@ class GameBoard:
     Sync map current original state with the new state and return new state with result
     """
     def syncAndReturn(self, hasLost=False):
-        hasWon = self.hasWon()
+        hasWon = self.hasPlayerWon()
         if hasWon:
             self.createSolution()
         self.synchronize()
-        return self.map_state, hasLost, hasWon
+        self.hasLost = hasLost
+        self.hasWon = hasWon
+        return
 
 
     """
