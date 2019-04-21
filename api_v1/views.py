@@ -38,13 +38,13 @@ class GameViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             move = request.data.get('move')
             gameBoard = GameBoard(json.loads(request.data.get('map_state')), json.loads(user.map_original))
-            new_map_state, hasLost = gameBoard.makeMove(move)
+            new_map_state, hasLost, hasWon = gameBoard.makeMove(move)
 
             serializer.save(
                 map_state=new_map_state,
                 map_original=json.dumps(gameBoard.map_original) #user.map_original
             )
-            return Response({'user': request.data, 'new_map_state': new_map_state, 'hasLost': hasLost})
+            return Response({'user': request.data, 'new_map_state': new_map_state, 'hasLost': hasLost, 'hasWon': hasWon})
         else:
             return Response({'error': 'some error'})
     

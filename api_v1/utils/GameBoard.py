@@ -46,6 +46,19 @@ class GameBoard:
 
 
     """
+    Find out if player has won/lost after a move
+    """
+    def hasWon(self):
+        hasWon = True
+        for row in range(self.row):
+            for col in range(self.col):
+                cell = self.map_original[row][col]
+                if not cell['has_mine'] and not cell['is_revealed']:
+                    hasWon = False
+        return hasWon 
+
+
+    """
     Traverse the map safely in all directions while revealing the cells along the way until you find a mine
     """
     def reveal(self, r, c):
@@ -103,11 +116,11 @@ class GameBoard:
                 if mines_around > 0:
                     
                     self.markCellVisited(row, col)
-                    return self.syncAndReturn(False)
+                    return self.syncAndReturn()
 
                 if cell_state == 0:
                     self.reveal(row, col)
-                    return self.syncAndReturn(False)
+                    return self.syncAndReturn()
 
         # intent is to flag this cell
         elif intent == 'flag':
@@ -118,7 +131,7 @@ class GameBoard:
             else:
                 cell['has_flag'] = False
 
-        return self.syncAndReturn(False)
+        return self.syncAndReturn()
 
 
     """
@@ -129,14 +142,18 @@ class GameBoard:
             for col in range(self.col):
                 self.map_state[row][col]['adj'] = self.map_original[row][col]['adj']
                 self.map_state[row][col]['state'] = self.map_original[row][col]['state']
+                # self.map_state[row][col]['has_mine'] = self.map_original[row][col]['has_mine']
 
 
     """
     Sync map current original state with the new state and return new state with result
     """
-    def syncAndReturn(self, result):
+    def syncAndReturn(self, hasLost=False):
+        hasWon = self.hasWon()
+        if hasWon:
+            self.createSolution()
         self.synchronize()
-        return self.map_state, result
+        return self.map_state, hasLost, hasWon
 
 
     """
