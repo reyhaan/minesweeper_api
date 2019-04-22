@@ -25,25 +25,6 @@ class GameBoard:
 
 
     """
-    Ideally the states should represent following:
-        - 0: Default
-        - 1: Revealed
-        - 2: Has Mine
-        - 3: Flagged
-    """
-    def getState(self, cell):
-
-        if cell['has_flag'] == True and cell['adj'] == 0:
-            return 3
-        elif cell['has_flag'] == False and cell['is_revealed'] == False:
-            return 0
-        elif cell['is_revealed'] == True and cell['has_mine'] == True:
-            return 2
-        elif cell['is_revealed'] == True and not cell['has_mine']:
-            return 1
-
-
-    """
     Creates the final solution map
     """
     def createSolution(self):
@@ -55,7 +36,7 @@ class GameBoard:
                     if self.map_original[row][col]['has_flag']:
                         self.map_original[row][col]['state'] = 4
                     else:
-                        self.map_original[row][col]['state'] = 2 # self.getState(self.map_original[row][col])
+                        self.map_original[row][col]['state'] = 2
 
 
     """
@@ -126,8 +107,6 @@ class GameBoard:
 
         cell = self.map_original[row][col]
         
-        cell_state = self.getState(cell)
-
         # Intent is to reveal the cell
         if intent == 'reveal':
 
@@ -147,17 +126,17 @@ class GameBoard:
                     self.markCellVisited(row, col)
                     return self.syncAndReturn()
 
-                if cell_state == 0:
+                if cell['state'] == 0:
                     self.reveal(row, col)
                     return self.syncAndReturn()
 
         # intent is to flag this cell
         elif intent == 'flag':
 
-            if cell_state == 0:
+            if cell['state'] == 0:
                 cell['has_flag'] = True
                 cell['state'] = 3
-            elif cell_state == 3:
+            elif cell['state'] == 3:
                 cell['has_flag'] = False
                 cell['state'] = 0
 
