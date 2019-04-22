@@ -33,7 +33,7 @@ class GameBoard:
     """
     def getState(self, cell):
 
-        if cell['has_flag'] == True:
+        if cell['has_flag'] == True and cell['adj'] == 0:
             return 3
         elif cell['has_flag'] == False and cell['is_revealed'] == False:
             return 0
@@ -49,9 +49,13 @@ class GameBoard:
     def createSolution(self):
         for row in range(self.row):
             for col in range(self.col):
-                self.map_original[row][col]['adj'] = self.getMinesAround(row, col)
-                self.map_original[row][col]['is_revealed'] = True
-                self.map_original[row][col]['state'] = self.getState(self.map_original[row][col])
+                if self.map_original[row][col]['has_mine']:
+                    self.map_original[row][col]['adj'] = self.getMinesAround(row, col)
+                    self.map_original[row][col]['is_revealed'] = True
+                    if self.map_original[row][col]['has_flag']:
+                        self.map_original[row][col]['state'] = 4
+                    else:
+                        self.map_original[row][col]['state'] = 2 # self.getState(self.map_original[row][col])
 
 
     """
@@ -60,7 +64,7 @@ class GameBoard:
     def markCellVisited(self, r, c):
         self.map_original[r][c]['adj'] = self.getMinesAround(r, c)
         self.map_original[r][c]['is_revealed'] = True
-        self.map_original[r][c]['state'] = self.getState(self.map_original[r][c])
+        self.map_original[r][c]['state'] = 1
 
 
     """
@@ -81,18 +85,22 @@ class GameBoard:
     """
     def reveal(self, r, c):
 
+
         # bound checks
         if (r < 0 or c < 0 or r >= len(self.map_original) or c >= len(self.map_original[0])):
             return
 
+        cell = self.map_original[r][c]
+
         # stop searching if found a mine
-        if self.map_original[r][c]['has_mine'] == True or self.map_original[r][c]['is_revealed'] == True:
+        if cell['has_mine'] == True or cell['is_revealed'] == True:
             return
 
-        self.markCellVisited(r, c)
+        if not cell['has_flag']:
+            self.markCellVisited(r, c)
 
         # Dont search further if any of the next cells has a mine
-        if self.map_original[r][c]['adj'] > 0:
+        if cell['adj'] > 0:
             return
 
         self.reveal(r+1, c)
@@ -123,6 +131,9 @@ class GameBoard:
         # Intent is to reveal the cell
         if intent == 'reveal':
 
+            if cell['has_flag']:
+                return self.syncAndReturn()
+
             # found a mine already, finish the game
             if cell['has_mine']:
                 self.createSolution()
@@ -146,8 +157,9 @@ class GameBoard:
             if cell_state == 0:
                 cell['has_flag'] = True
                 cell['state'] = 3
-            else:
+            elif cell_state == 3:
                 cell['has_flag'] = False
+                cell['state'] = 0
 
         return self.syncAndReturn()
 
@@ -160,7 +172,7 @@ class GameBoard:
             for col in range(self.col):
                 self.map_state[row][col]['adj'] = self.map_original[row][col]['adj']
                 self.map_state[row][col]['state'] = self.map_original[row][col]['state']
-                # self.map_state[row][col]['has_mine'] = self.map_original[row][col]['has_mine']
+                self.map_state[row][col]['has_mine'] = self.map_original[row][col]['has_mine']
 
 
     """
