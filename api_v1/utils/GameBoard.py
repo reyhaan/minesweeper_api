@@ -151,7 +151,7 @@ class GameBoard:
             for col in range(self.col):
                 self.map_state[row][col]['adj'] = self.map_original[row][col]['adj']
                 self.map_state[row][col]['state'] = self.map_original[row][col]['state']
-                self.map_state[row][col]['has_mine'] = self.map_original[row][col]['has_mine']
+                # self.map_state[row][col]['has_mine'] = self.map_original[row][col]['has_mine']
 
 
     """
