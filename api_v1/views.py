@@ -66,7 +66,6 @@ class GameViewSet(viewsets.ModelViewSet):
             )
 
             response = {
-                'user': request.data, 
                 'new_map_state': gameBoard.getMapState(), 
                 'hasLost': gameBoard.getHasLost(), 
                 'hasWon': gameBoard.getHasWon()
