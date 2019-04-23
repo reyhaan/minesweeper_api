@@ -35,7 +35,9 @@ class GameViewSet(viewsets.ModelViewSet):
         response = {
             'name': user.name,
             'uuid': user.uuid,
-            'map_state': json.loads(user.map_state)
+            'map_state': json.loads(user.map_state),
+            'hasLost': user.has_lost,
+            'hasWon': user.has_won
         }
 
         return Response(response, status=status.HTTP_200_OK)
@@ -60,15 +62,20 @@ class GameViewSet(viewsets.ModelViewSet):
             gameBoard = GameBoard(map_state, map_original)
             gameBoard.makeMove(move)
 
+            hasLost = gameBoard.getHasLost()
+            hasWon = gameBoard.getHasWon()
+
             serializer.save(
                 map_state=json.dumps(gameBoard.getMapState()),
-                map_original=json.dumps(gameBoard.getMapOriginal())
+                map_original=json.dumps(gameBoard.getMapOriginal()),
+                has_lost=hasLost,
+                has_won=hasWon
             )
 
             response = {
                 'new_map_state': gameBoard.getMapState(), 
-                'hasLost': gameBoard.getHasLost(), 
-                'hasWon': gameBoard.getHasWon()
+                'hasLost': hasLost, 
+                'hasWon': hasWon
             }
 
             return Response(response, status=status.HTTP_200_OK)

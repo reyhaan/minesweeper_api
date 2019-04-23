@@ -6,3 +6,5 @@ class Game(models.Model):
     name        = models.CharField(max_length=120)
     map_state    = models.TextField()
     map_original = models.TextField()
+    has_lost    = models.BooleanField(default=False)
+    has_won     = models.BooleanField(default=False)
