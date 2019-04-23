@@ -94,7 +94,9 @@ class GameViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save( 
                 map_state=json.dumps(new_map_state),
-                map_original=json.dumps(new_map_original)
+                map_original=json.dumps(new_map_original),
+                has_lost=False,
+                has_won=False
             )
 
             response = {
