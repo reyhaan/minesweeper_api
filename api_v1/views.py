@@ -7,6 +7,7 @@ from api_v1.serializers import GameSerializer
 from api_v1.utils import mapUtils
 from api_v1.utils.GameBoard import GameBoard
 import json
+from api_v1.utils.websocketUtils import sio
 
 class GameViewSet(viewsets.ModelViewSet):
 
@@ -78,6 +79,15 @@ class GameViewSet(viewsets.ModelViewSet):
                 'hasWon': hasWon
             }
 
+            sio.emit(
+				'event',
+				json.dumps({
+					'room': 'game',
+					'event': 'move:' + request.data.get('uuid'),
+					'data': json.dumps(response),
+				})
+			)
+
             return Response(response, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -102,6 +112,15 @@ class GameViewSet(viewsets.ModelViewSet):
             response = {
                 'new_map_state': new_map_state
             }
+
+            sio.emit(
+				'event',
+				json.dumps({
+					'room': 'game',
+					'event': 'new_game:' + request.data.get('uuid'),
+					'data': json.dumps(response),
+				})
+			)
 
             return Response(response, status=status.HTTP_200_OK)
         else:
